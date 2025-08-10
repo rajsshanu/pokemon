@@ -3,12 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Retro Pokémon Personality Quiz</title>
+  <title>Retro Pokémon Personality Quiz — Card Download Fix</title>
 
   <!-- Pixel font -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- html2canvas library for card download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
+    /* Original Quiz Styles */
     :root{
       --gc-purple:#663399;
       --gc-silver:#b8bcc8;
@@ -35,23 +40,16 @@
       color:var(--text-light);
       min-height:100vh;
     }
-
-    /* GameCube-style console */
     .gamecube{
-      width:520px;
+      width:820px;
       background: linear-gradient(145deg, var(--gc-purple) 0%, #5a2d91 35%, #4a2570 100%);
       border:8px solid var(--gc-silver);
       border-radius:25px;
-      box-shadow: 
-        0 25px 50px rgba(0,0,0,0.8),
-        inset 0 4px 8px rgba(255,255,255,0.1),
-        inset 0 -4px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 4px 8px rgba(255,255,255,0.1), inset 0 -4px 8px rgba(0,0,0,0.3);
       padding:25px;
       position:relative;
       overflow:hidden;
     }
-
-    /* GameCube logo area */
     .console-header{
       text-align:center;
       margin-bottom:20px;
@@ -60,300 +58,166 @@
       border-radius:15px;
       border:2px solid rgba(255,255,255,0.2);
     }
-    
-    .console-logo{
-      color:var(--gc-orange);
-      font-size:14px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-      letter-spacing:2px;
-    }
-
-    /* Main gaming area */
-    .gaming-area{
-      display:flex;
-      gap:20px;
-      align-items:flex-start;
-    }
-
-    /* Left: Main screen (like GameCube's disc tray area) */
+    .console-logo{ color:var(--gc-orange); font-size:14px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); letter-spacing:2px; }
+    .gaming-area{ display:flex; gap:20px; align-items:flex-start; }
     .main-screen {
-      width:340px;
-      background: linear-gradient(145deg, var(--screen-bg), #16213e);
-      border:6px solid var(--gc-silver);
-      border-radius:20px;
-      padding:18px;
-      min-height:320px;
-      box-shadow: 
-        inset 0 8px 16px rgba(0,0,0,0.6),
-        inset 0 0 20px rgba(74,105,189,0.1),
-        0 0 30px rgba(74,105,189,0.3);
-      position:relative;
-      overflow:hidden;
+      width:540px; background: linear-gradient(145deg, var(--screen-bg), #16213e); border:6px solid var(--gc-silver); border-radius:20px;
+      padding:18px; min-height:320px; box-shadow: inset 0 8px 16px rgba(0,0,0,0.6), inset 0 0 20px rgba(74,105,189,0.1), 0 0 30px rgba(74,105,189,0.3);
+      position:relative; overflow:hidden;
     }
-
-    /* Screen glow effect */
     .main-screen::before{
-      content:'';
-      position:absolute;
-      top:-2px;
-      left:-2px;
-      right:-2px;
-      bottom:-2px;
-      background: linear-gradient(45deg, 
-        rgba(74,105,189,0.3), 
-        rgba(255,107,53,0.2), 
-        rgba(74,105,189,0.3));
-      border-radius:20px;
-      z-index:-1;
-      animation:screenGlow 3s ease-in-out infinite alternate;
+      content:''; position:absolute; top:-2px; left:-2px; right:-2px; bottom:-2px;
+      background: linear-gradient(45deg, rgba(74,105,189,0.3), rgba(255,107,53,0.2), rgba(74,105,189,0.3));
+      border-radius:20px; z-index:-1; animation:screenGlow 3s ease-in-out infinite alternate;
     }
-
-    @keyframes screenGlow {
-      0% { opacity:0.3; }
-      100% { opacity:0.7; }
-    }
-
-    /* Dialog area */
+    @keyframes screenGlow { 0% { opacity:0.3; } 100% { opacity:0.7; } }
     .dialog {
-      background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-      border:3px solid rgba(74,105,189,0.4);
-      border-radius:12px;
-      padding:16px;
-      min-height:90px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      font-size:11px;
-      color:var(--text-light);
-      box-shadow: 
-        inset 0 2px 4px rgba(255,255,255,0.1),
-        0 4px 8px rgba(0,0,0,0.3);
+      background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border:3px solid rgba(74,105,189,0.4); border-radius:12px;
+      padding:16px; min-height:90px; display:flex; align-items:center; justify-content:center; text-align:center; font-size:11px; color:var(--text-light);
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.3);
     }
-
-    /* Options area */
-    .options {
-      margin-top:15px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      align-items:center;
-    }
-
-    /* GameCube-style buttons */
+    .options { margin-top:15px; display:flex; flex-direction:column; gap:10px; align-items:center; }
     .option-btn{
-      width:92%;
-      background: linear-gradient(145deg, var(--button-gray), var(--button-light));
-      color:var(--text-dark);
-      border:3px solid var(--gc-silver);
-      border-radius:12px;
-      padding:10px 8px;
-      font-size:10px;
-      cursor:pointer;
-      transition:all 0.15s ease;
-      text-align:center;
-      user-select:none;
-      box-shadow: 
-        0 4px 8px rgba(0,0,0,0.3),
-        inset 0 2px 4px rgba(255,255,255,0.3);
-      position:relative;
+      width:92%; background: linear-gradient(145deg, var(--button-gray), var(--button-light)); color:var(--text-dark); border:3px solid var(--gc-silver);
+      border-radius:12px; padding:10px 8px; font-size:10px; cursor:pointer; transition:all 0.15s ease; text-align:center; user-select:none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.3); position:relative;
     }
-
     .option-btn:hover{
-      transform:translateY(-3px);
-      background: linear-gradient(145deg, var(--accent), var(--accent-dark));
-      color:var(--text-light);
-      box-shadow: 
-        0 6px 12px rgba(0,0,0,0.4),
-        inset 0 2px 4px rgba(255,255,255,0.2);
+      transform:translateY(-3px); background: linear-gradient(145deg, var(--accent), var(--accent-dark)); color:var(--text-light);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.2);
     }
-
-    .option-btn:active{
-      transform:translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    /* Name input styling */
+    .option-btn:active{ transform:translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
     .name-input {
-      width:92%;
-      background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-      color:var(--text-light);
-      border:3px solid var(--gc-silver);
-      border-radius:12px;
-      padding:10px 8px;
-      font-size:10px;
-      text-align:center;
-      font-family:'Press Start 2P', monospace;
-      margin:8px 0;
-      box-shadow: 
-        inset 0 4px 8px rgba(0,0,0,0.4),
-        0 2px 4px rgba(74,105,189,0.3);
+      width:92%; background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); color:var(--text-light); border:3px solid var(--gc-silver);
+      border-radius:12px; padding:10px 8px; font-size:10px; text-align:center; font-family:'Press Start 2P', monospace; margin:8px 0;
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.4), 0 2px 4px rgba(74,105,189,0.3);
     }
-    .name-input::placeholder {
-      color:rgba(232,232,232,0.5);
-    }
-    .name-input:focus {
-      outline:none;
-      border-color:var(--accent);
-      box-shadow: 
-        inset 0 4px 8px rgba(0,0,0,0.4),
-        0 0 12px rgba(255,107,53,0.5);
-    }
-
-    /* Right: Controller/Info panel */
-    .controller-panel{
-      width:140px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      align-items:center;
-    }
-
-    /* Power indicator */
+    .name-input::placeholder { color:rgba(232,232,232,0.5); }
+    .name-input:focus { outline:none; border-color:var(--accent); box-shadow: inset 0 4px 8px rgba(0,0,0,0.4), 0 0 12px rgba(255,107,53,0.5); }
+    .controller-panel{ width:140px; display:flex; flex-direction:column; gap:12px; align-items:center; }
     .power-indicator{
-      width:100%;
-      height:30px;
-      background: linear-gradient(90deg, var(--gc-orange), #ff8533);
-      border-radius:15px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:white;
-      font-size:8px;
-      border:2px solid rgba(255,255,255,0.3);
-      box-shadow: 
-        0 4px 8px rgba(0,0,0,0.3),
-        inset 0 2px 4px rgba(255,255,255,0.2);
-      animation:powerPulse 2s ease-in-out infinite alternate;
+      width:100%; height:30px; background: linear-gradient(90deg, var(--gc-orange), #ff8533); border-radius:15px; display:flex; align-items:center;
+      justify-content:center; color:white; font-size:8px; border:2px solid rgba(255,255,255,0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2); animation:powerPulse 2s ease-in-out infinite alternate;
     }
-
-    @keyframes powerPulse {
-      0% { box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2); }
-      100% { box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2), 0 0 20px rgba(255,102,0,0.6); }
-    }
-
-    /* Pokémon preview (like memory card slot) */
+    @keyframes powerPulse { 0% { box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2); } 100% { box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2), 0 0 20px rgba(255,102,0,0.6); } }
     .preview-slot {
-      width:100%;
-      height:140px;
-      background: linear-gradient(145deg, #2a2a3e, #1a1a2e);
-      border:4px solid var(--gc-silver);
-      border-radius:15px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:8px;
-      box-shadow: 
-        inset 0 6px 12px rgba(0,0,0,0.5),
-        0 4px 8px rgba(0,0,0,0.3);
-      position:relative;
-      overflow:hidden;
+      width:100%; height:140px; background: linear-gradient(145deg, #2a2a3e, #1a1a2e); border:4px solid var(--gc-silver); border-radius:15px;
+      display:flex; align-items:center; justify-content:center; padding:8px; box-shadow: inset 0 6px 12px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+      position:relative; overflow:hidden;
     }
-
     .preview-slot::before{
-      content:'';
-      position:absolute;
-      top:5px;
-      left:5px;
-      right:5px;
-      height:2px;
-      background: linear-gradient(90deg, transparent, rgba(74,105,189,0.8), transparent);
-      animation:scanLine 2s linear infinite;
+      content:''; position:absolute; top:5px; left:5px; right:5px; height:2px;
+      background: linear-gradient(90deg, transparent, rgba(74,105,189,0.8), transparent); animation:scanLine 2s linear infinite;
     }
-
-    @keyframes scanLine {
-      0% { transform:translateY(0); opacity:1; }
-      50% { opacity:0.3; }
-      100% { transform:translateY(120px); opacity:1; }
-    }
-
-    .preview-slot img{
-      max-width:100%;
-      max-height:100%;
-      image-rendering: pixelated;
-      filter:drop-shadow(0 0 10px rgba(74,105,189,0.5));
-    }
-
-    /* Status display */
+    @keyframes scanLine { 0% { transform:translateY(0); opacity:1; } 50% { opacity:0.3; } 100% { transform:translateY(120px); opacity:1; } }
+    .preview-slot img{ max-width:100%; max-height:100%; image-rendering: pixelated; filter:drop-shadow(0 0 10px rgba(74,105,189,0.5)); }
     .status-display {
-      width:100%;
-      background: linear-gradient(145deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
-      border:2px solid var(--gc-silver);
-      border-radius:10px;
-      padding:8px;
-      text-align:center;
-      font-size:8px;
-      color:var(--text-light);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      width:100%; background: linear-gradient(145deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3)); border:2px solid var(--gc-silver); border-radius:10px;
+      padding:8px; text-align:center; font-size:8px; color:var(--text-light); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
     }
-
-    /* Typing caret */
-    .typing { 
-      display:inline-block;
-      width:8px;
-      height:12px;
-      background:var(--accent);
-      margin-left:6px;
-      vertical-align:middle;
-      animation:blink 1s steps(1) infinite;
-      box-shadow: 0 0 4px rgba(255,107,53,0.8);
-    }
+    .typing { display:inline-block; width:8px; height:12px; background:var(--accent); margin-left:6px; vertical-align:middle; animation:blink 1s steps(1) infinite; box-shadow: 0 0 4px rgba(255,107,53,0.8); }
     @keyframes blink{50%{opacity:0}}
-
-    /* Result styles */
-    .result-screen{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:12px;
-    }
+    .result-screen{ display:flex; flex-direction:column; align-items:center; gap:12px; }
     .result-card{
-      width:100%;
-      background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-      border:3px solid rgba(74,105,189,0.6);
-      border-radius:15px;
-      padding:16px;
-      text-align:center;
-      box-shadow: 
-        inset 0 2px 4px rgba(255,255,255,0.1),
-        0 8px 16px rgba(0,0,0,0.3);
+      width:100%; background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border:3px solid rgba(74,105,189,0.6);
+      border-radius:15px; padding:16px; text-align:center; box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 8px 16px rgba(0,0,0,0.3);
     }
-    .pokemon-name{
-      font-size:12px;
-      color:var(--accent);
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-    }
-    .trainer-name{
-      font-size:10px;
-      color:var(--text-light);
-      margin-bottom:8px;
-      opacity:0.9;
-    }
+    .pokemon-name{ font-size:12px; color:var(--accent); text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+    .trainer-name{ font-size:10px; color:var(--text-light); margin-bottom:8px; opacity:0.9; }
     .restart{
-      background: linear-gradient(145deg, var(--gc-orange), #e55a00);
-      color:white;
-      border:3px solid var(--gc-silver);
-      border-radius:12px;
-      padding:10px 16px;
-      font-size:10px;
-      cursor:pointer;
-      transition:all 0.15s ease;
-      box-shadow: 
-        0 4px 8px rgba(0,0,0,0.3),
-        inset 0 2px 4px rgba(255,255,255,0.2);
+      background: linear-gradient(145deg, var(--gc-orange), #e55a00); color:white; border:3px solid var(--gc-silver); border-radius:12px;
+      padding:10px 16px; font-size:10px; cursor:pointer; transition:all 0.15s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2);
     }
-    .restart:hover{
-      transform:translateY(-2px);
-      box-shadow: 
-        0 6px 12px rgba(0,0,0,0.4),
-        inset 0 2px 4px rgba(255,255,255,0.3);
-    }
-    .restart:active{
-      transform:translateY(0);
+    .restart:hover{ transform:translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3); }
+    .restart:active{ transform:translateY(0); }
+    .muted{opacity:0.8; font-size:9px; color:var(--text-light); margin-top:8px;}
+    .result-buttons { display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: center; }
+
+    /* New Holo Card Styles (from card2.html) */
+    .holo-card-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        font-family: 'PT Sans', sans-serif;
     }
 
-    /* Helper styles */
-    .muted{opacity:0.8; font-size:9px; color:var(--text-light); margin-top:8px;}
+    .pokemon-card {
+        width: 380px;
+        height: 530px;
+        background: #e6e6e6;
+        border: 12px solid #f9d71c;
+        border-radius: 20px;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        transition: transform 0.2s ease-out;
+        --mx: 0.5; 
+        --my: 0.5;
+    }
+    .card-inner {
+        width: 100%; height: 100%;
+        background: linear-gradient(to bottom, #d3d3d3 25%, #ff8c00 45%);
+        position: relative; overflow: hidden;
+    }
+    .card-inner::before {
+        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background-image: repeating-radial-gradient(circle at center, rgba(255,255,255,0.2) 0, rgba(255,255,255,0.2) 1px, transparent 1px, transparent 10px);
+        background-size: 20px 20px;
+        background-position: calc((var(--mx) - 0.5) * 40px) calc((var(--my) - 0.5) * 40px);
+        mask-image: linear-gradient(to bottom, transparent 30%, black 50%);
+        -webkit-mask-image: linear-gradient(to bottom, transparent 30%, black 50%);
+        z-index: 1; pointer-events: none; transition: opacity 0.3s;
+    }
+    .card-inner.is-capturing::before {
+        background-image: url('https://www.transparenttextures.com/patterns/sparkles.png');
+        background-size: auto; background-position: 0 0; opacity: 0.6; mix-blend-mode: overlay;
+    }
+    .card-header, .image-container, .stats-bar, .attacks-section, .card-footer { position: relative; z-index: 2; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; font-family: 'PT Sans', sans-serif; font-weight: 700; color: black; }
+    .stage-info { font-size: 16px; }
+    .stage-info .evolves-from { font-size: 12px; font-weight: 400; margin-left: 10px; font-style: italic; }
+    .hp-info { display: flex; align-items: center; font-size: 24px; }
+    .hp-info .hp-text { font-size: 12px; font-weight: 400; margin-right: 2px; position: relative; top: -5px; }
+    .energy-symbol { width: 30px; height: 30px; border-radius: 50%; background-color: #ff4500; border: 2px solid white; margin-left: 5px; }
+    .image-container {
+        width: 90%; height: 200px; margin: 0 auto;
+        border: 4px solid #c0c0c0; background-size: cover; background-position: center;
+    }
+    .image-container::before, .image-container::after {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        opacity: 0; transition: opacity 0.3s ease-in-out; pointer-events: none;
+    }
+    .image-container::before { background: linear-gradient(135deg, rgba(255,0,0,0.5) 0%, rgba(255,165,0,0.5) 20%, rgba(255,255,0,0.5) 40%, rgba(0,128,0,0.5) 60%, rgba(0,0,255,0.5) 80%, rgba(75,0,130,0.5) 100%); mix-blend-mode: hard-light; }
+    .image-container::after { background: radial-gradient(circle at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgba(255,255,255,0.8) 1%, transparent 2%), repeating-radial-gradient(rgba(255,255,255,0.2) 0, rgba(255,255,255,0.2) 1px, transparent 1px, transparent 10px); background-size: 40px 40px, 100% 100%; }
+    .pokemon-card:hover .image-container::before, .pokemon-card:hover .image-container::after { opacity: 1; }
+    .stats-bar { background: #c0c0c0; text-align: center; padding: 2px; font-size: 12px; font-style: italic; color: black; }
+    .attacks-section { padding: 10px 15px; color: black; }
+    .ability { display: flex; align-items: center; margin-bottom: 15px; }
+    .ability-name { font-weight: 700; font-size: 18px; margin-left: 10px; }
+    .ability-tag { background: #e74c3c; color: white; padding: 5px 10px; border-radius: 15px; font-weight: 700; clip-path: polygon(0% 0%, 85% 0, 100% 50%, 85% 100%, 0% 100%); }
+    .ability-description, .attack-description { font-size: 12px; margin: 0; font-family: 'PT Sans', sans-serif; }
+    .attack { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+    .attack-cost { display: flex; gap: 5px; }
+    .attack-cost .energy-symbol { width: 20px; height: 20px; }
+    .attack-name { font-weight: 700; font-size: 18px; flex-grow: 1; margin-left: 10px; }
+    .attack-damage { font-weight: 700; font-size: 18px; }
+    .card-footer { display: flex; justify-content: space-between; padding: 10px 15px; border-top: 2px solid #c0c0c0; font-size: 12px; color: black; }
+    .footer-item { display: flex; flex-direction: column; align-items: center; font-weight: bold; }
+    .back-button {
+        background: linear-gradient(145deg, #6c7b7f, #9ca3af);
+        color: #0f0f23;
+        border: 3px solid var(--gc-silver);
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-family:'Press Start 2P', monospace;
+        font-size: 10px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    .back-button:hover { background: linear-gradient(145deg, var(--accent), var(--accent-dark)); color: white; }
 
     /* Responsive adjustments */
     @media (max-width: 600px) {
@@ -361,20 +225,54 @@
       .gaming-area { flex-direction:column; }
       .controller-panel { width:100%; flex-direction:row; justify-content:space-around; }
       .preview-slot { height:100px; }
+      .pokemon-card { width: 95%; height: auto; font-size: 14px; } /* Adjust card size */
     }
   </style>
 </head>
 
 <body>
-  <div class="gamecube" role="application" aria-label="Pokemon personality quiz">
+  <!-- Main Quiz UI -->
+  <div class="gamecube" id="gamecube-console" role="application" aria-label="Pokemon personality quiz">
     <div class="console-header">
       <div class="console-logo">◈ POKÉCUBE QUIZ ◈</div>
     </div>
     
     <div class="gaming-area">
       <div class="main-screen" id="screen">
-        <div class="dialog" id="dialog">Loading...</div>
-        <div class="options" id="options"></div>
+        <!-- This area is controlled by JS: dialog, options, results -->
+        <div id="quiz-content">
+            <div class="dialog" id="dialog">Loading...</div>
+            <div class="options" id="options"></div>
+        </div>
+        <!-- This is where the holo card will be displayed -->
+        <div class="holo-card-container" id="holo-card-container" style="display: none;">
+            <div class="pokemon-card" id="pokemon-card">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <div class="stage-info" id="card-stage-info"></div>
+                        <div class="hp-info"><span class="hp-text">HP</span> <span id="card-hp"></span><div class="energy-symbol" id="card-energy-symbol"></div></div>
+                    </div>
+                    <div class="image-container" id="card-image-container"></div>
+                    <div class="stats-bar" id="card-stats-bar"></div>
+                    <div class="attacks-section">
+                        <div class="ability"><span class="ability-tag">Ability</span><span class="ability-name" id="card-ability-name"></span></div>
+                        <p class="ability-description" id="card-ability-description"></p>
+                        <div class="attack">
+                            <div class="attack-cost"><div class="energy-symbol"></div><div class="energy-symbol"></div></div>
+                            <span class="attack-name" id="card-attack-name"></span>
+                            <span class="attack-damage" id="card-attack-damage"></span>
+                        </div>
+                        <p class="attack-description" id="card-attack-description"></p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="footer-item"><span>weakness</span><span id="card-weakness"></span></div>
+                        <div class="footer-item"><span>resistance</span></div>
+                        <div class="footer-item"><span>retreat</span><span id="card-retreat"></span></div>
+                    </div>
+                </div>
+            </div>
+            <button class="back-button" id="back-to-result">Back to Summary</button>
+        </div>
       </div>
 
       <div class="controller-panel">
@@ -390,7 +288,7 @@
 <script>
 /* ============= QUIZ DATA ============= */
 const quizQuestions = [
-  { question: "What's your favorite color palette?", options: ["Neon","Pastel","Earthy","Dark tones","Red","Blue","Green","Yellow","Orange","Aqua","Brown","Purple"] },
+  { question: "What's your favorite color palette?", options: ["Neon","Pastal","Earthy","Dark tones","Red","Blue","Green","Yellow","Orange","Aqua","Brown","Purple"] },
   { question: "Pick your ideal drink:", options: ["Coffee","Matcha","Tea","Juice","Spicy","Mild","Sweet","Sour"] },
   { question: "What weather do you prefer?", options: ["Sunny","Rainy","Cloudy","Snowy"] },
   { question: "How would you describe your personality?", options: ["Fast","Calm","Steady","Unpredictable"] },
@@ -404,8 +302,27 @@ const quizQuestions = [
   { question: "Pick your ideal hangout spot:", options: ["Bonfire","Lake","Lightning","Arcade","Café","Greenhouse"] }
 ];
 
+/* ============ POKEMON CARD DETAILS ============ */
+const pokemonDetails = {
+    charizard: { stage: 'STAGE 2', evolvesFrom: 'Evolves from Charmeleon', hp: '170', type: '#ff4500', stats: "NO. 006 Flame Pokémon HT: 5'7\" WT: 199.5 lbs.", abilityName: 'Battle Sense', abilityDescription: 'Once during your turn, you may look at the top 3 cards of your deck and put 1 of them into your hand. Discard the other cards.', attackName: 'Royal Blaze', attackDamage: '100+', attackDescription: 'This attack does 50 more damage for each Leon card in your discard pile.', weakness: '💧 x2', retreat: '⭐ ⭐ ⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png' },
+    blastoise: { stage: 'STAGE 2', evolvesFrom: 'Evolves from Wartortle', hp: '180', type: '#4a90e2', stats: "NO. 009 Shellfish Pokémon HT: 5'3\" WT: 188.5 lbs.", abilityName: 'Vitality Spring', abilityDescription: 'Once during your turn, you may search your deck for up to 3 Water Energy cards and attach them to your Pokémon in any way you like.', attackName: 'Hydro Pump', attackDamage: '120', attackDescription: 'This attack does 20 more damage for each Water Energy attached.', weakness: '⚡ x2', retreat: '⭐ ⭐ ⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png' },
+    venusaur: { stage: 'STAGE 2', evolvesFrom: 'Evolves from Ivysaur', hp: '180', type: '#78c850', stats: "NO. 003 Seed Pokémon HT: 6'7\" WT: 220.5 lbs.", abilityName: 'Jungle Totem', abilityDescription: 'Your Grass Pokémon in play, except for any Venusaur, have no Weakness.', attackName: 'Solar Beam', attackDamage: '120', attackDescription: "This Pokémon can't use Solar Beam during your next turn.", weakness: '🔥 x2', retreat: '⭐ ⭐ ⭐ ⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png' },
+    pikachu: { stage: 'BASIC', evolvesFrom: '', hp: '60', type: '#f8d030', stats: "NO. 025 Mouse Pokémon HT: 1'4\" WT: 13.2 lbs.", abilityName: 'Static', abilityDescription: "If this Pokémon is your Active Pokémon and is damaged by an opponent's attack, the Attacking Pokémon is now Paralyzed.", attackName: 'Thunder Shock', attackDamage: '20', attackDescription: 'Flip a coin. If heads, the Defending Pokémon is now Paralyzed.', weakness: '🐾 x2', retreat: '⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png' },
+    alakazam: { stage: 'STAGE 2', evolvesFrom: 'Evolves from Kadabra', hp: '130', type: '#f85888', stats: "NO. 065 Psi Pokémon HT: 4'11\" WT: 105.8 lbs.", abilityName: 'Mind Ruler', abilityDescription: "Prevent all effects of your opponent's attacks, except damage, done to your Benched Pokémon.", attackName: 'Zen Spoon', attackDamage: '60x', attackDescription: "This attack does 60 damage for each of your opponent's Benched Pokémon.", weakness: '🐾 x2', retreat: '⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/65.png' },
+    articuno: { stage: 'BASIC', evolvesFrom: '', hp: '120', type: '#98d8d8', stats: "NO. 144 Freeze Pokémon HT: 5'7\" WT: 122.1 lbs.", abilityName: 'Ice Wing', abilityDescription: "Discard a Water Energy from this Pokémon. The Defending Pokémon can't attack during your opponent's next turn.", attackName: 'Blizzard', attackDamage: '110', attackDescription: "This attack does 10 damage to each of your opponent's Benched Pokémon.", weakness: '⚙️ x2', retreat: '⭐ ⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/144.png' },
+    onix: { stage: 'BASIC', evolvesFrom: '', hp: '120', type: '#e0c068', stats: "NO. 095 Rock Snake Pokémon HT: 28'10\" WT: 463.0 lbs.", abilityName: 'Sturdy', abilityDescription: 'If this Pokémon has full HP and would be Knocked Out by damage from an attack, it is not Knocked Out and its remaining HP becomes 10.', attackName: 'Rock Slide', attackDamage: '80', attackDescription: "This attack does 20 damage to 2 of your opponent's Benched Pokémon.", weakness: '🌿 x2', retreat: '⭐ ⭐ ⭐ ⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/95.png' },
+    umbreon: { stage: 'STAGE 1', evolvesFrom: 'Evolves from Eevee', hp: '110', type: '#2a1810', stats: "NO. 197 Moonlight Pokémon HT: 3'3\" WT: 59.5 lbs.", abilityName: 'Dark Signal', abilityDescription: "When you play this Pokémon from your hand to evolve 1 of your Pokémon, you may switch 1 of your opponent's Benched Pokémon with their Active Pokémon.", attackName: 'Mean Look', attackDamage: '70', attackDescription: "The Defending Pokémon can't retreat during your opponent's next turn.", weakness: '🌿 x2', retreat: '⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png' },
+    gardevoir: { stage: 'STAGE 2', evolvesFrom: 'Evolves from Kirlia', hp: '140', type: '#f098a8', stats: "NO. 282 Embrace Pokémon HT: 5'3\" WT: 106.7 lbs.", abilityName: 'Shining Arcana', abilityDescription: 'Once during your turn, you may look at the top 2 cards of your deck and attach any number of basic Energy cards you find there to your Pokémon in any way you like.', attackName: 'Brain Wave', attackDamage: '60+', attackDescription: 'This attack does 30 more damage for each Psychic Energy attached to this Pokémon.', weakness: '⚙️ x2', retreat: '⭐ ⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/282.png' },
+    togepi: { stage: 'BASIC', evolvesFrom: '', hp: '50', type: '#f0f0f0', stats: "NO. 175 Spike Ball Pokémon HT: 1'0\" WT: 3.3 lbs.", abilityName: 'Joyful Gift', abilityDescription: 'Once during your turn, you may heal 10 damage from one of your Benched Pokémon.', attackName: 'Charm', attackDamage: '10', attackDescription: "During your opponent's next turn, the Defending Pokémon's attacks do 20 less damage.", weakness: '⚙️ x2', retreat: '⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/175.png' },
+    jigglypuff: { stage: 'BASIC', evolvesFrom: '', hp: '70', type: '#f8b8f8', stats: "NO. 039 Balloon Pokémon HT: 1'8\" WT: 12.1 lbs.", abilityName: 'Lullaby', abilityDescription: 'The Defending Pokémon is now Asleep.', attackName: 'Pound', attackDamage: '20', attackDescription: '', weakness: '🐾 x2', retreat: '⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/39.png' },
+    vulpix: { stage: 'BASIC', evolvesFrom: '', hp: '60', type: '#ee8130', stats: "NO. 037 Fox Pokémon HT: 2'0\" WT: 21.8 lbs.", abilityName: 'Roar', abilityDescription: "Your opponent switches their Active Pokémon with 1 of their Benched Pokémon.", attackName: 'Ember', attackDamage: '30', attackDescription: 'Discard a Fire Energy from this Pokémon.', weakness: '💧 x2', retreat: '⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/37.png' },
+    squirtle: { stage: 'BASIC', evolvesFrom: '', hp: '60', type: '#6890f0', stats: "NO. 007 Tiny Turtle Pokémon HT: 1'8\" WT: 19.8 lbs.", abilityName: 'Shell Armor', abilityDescription: 'Prevent all damage done to this Pokémon by attacks if it is on the Bench.', attackName: 'Water Gun', attackDamage: '20', attackDescription: '', weakness: '🌿 x2', retreat: '⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png' },
+    piplup: { stage: 'BASIC', evolvesFrom: '', hp: '60', type: '#78c8f0', stats: "NO. 393 Penguin Pokémon HT: 1'4\" WT: 11.5 lbs.", abilityName: 'Bubble', abilityDescription: 'Flip a coin. If heads, the Defending Pokémon is now Paralyzed.', attackName: 'Peck', attackDamage: '10', attackDescription: '', weakness: '⚡ x2', retreat: '⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/393.png' },
+    psyduck: { stage: 'BASIC', evolvesFrom: '', hp: '70', type: '#f8d030', stats: "NO. 054 Duck Pokémon HT: 2'7\" WT: 43.2 lbs.", abilityName: 'Headache', abilityDescription: "This Pokémon can't attack if you have 3 or more cards in your hand.", attackName: 'Scratch', attackDamage: '50', attackDescription: '', weakness: '⚡ x2', retreat: '⭐', img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/54.png' }
+};
+
 /* ============= STATE ============= */
-let current = -1; // Start at -1 for name input
+let current = -1;
 let answers = [];
 let userName = "";
 
@@ -414,6 +331,9 @@ const dialogEl = document.getElementById('dialog');
 const optionsEl = document.getElementById('options');
 const previewImg = document.getElementById('preview-img');
 const statusEl = document.getElementById('status');
+const quizContentEl = document.getElementById('quiz-content');
+const holoCardContainerEl = document.getElementById('holo-card-container');
+const pokemonCardEl = document.getElementById('pokemon-card');
 
 /* ============= TYPING EFFECT ============= */
 function typeText(text, cb) {
@@ -425,7 +345,7 @@ function typeText(text, cb) {
   caret.className = 'typing';
   dialogEl.appendChild(caret);
 
-  const speed = 18; // ms per char
+  const speed = 18;
   function step() {
     if (i <= text.length) {
       span.textContent = text.slice(0, i);
@@ -444,7 +364,6 @@ function showNameInput() {
   typeText("Welcome to the Pokémon Personality Quiz! What's your name, trainer?", () => {});
   
   optionsEl.innerHTML = '';
-  
   const nameInput = document.createElement('input');
   nameInput.className = 'name-input';
   nameInput.type = 'text';
@@ -467,19 +386,12 @@ function showNameInput() {
     }
   };
   
-  // Allow Enter key to start quiz
-  nameInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      startBtn.click();
-    }
-  });
+  nameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') startBtn.click(); });
   
   optionsEl.appendChild(nameInput);
   optionsEl.appendChild(startBtn);
   
-  // Focus the input
   setTimeout(() => nameInput.focus(), 100);
-  
   statusEl.textContent = "Enter your trainer name";
 }
 
@@ -488,11 +400,8 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.rando
 
 function loadQuestion() {
   const q = quizQuestions[current];
-  // Show question with typing animation
   typeText(q.question, () => {});
-  // Clear and create option buttons
   optionsEl.innerHTML = '';
-  // shuffle options for variety
   const opts = shuffle([...q.options]);
   opts.forEach(opt => {
     const btn = document.createElement('button');
@@ -504,31 +413,19 @@ function loadQuestion() {
     };
     optionsEl.appendChild(btn);
   });
-
-  // Update preview & status
   previewImg.src = getPreviewForQuestion(current);
   statusEl.textContent = `Question ${current+1} / ${quizQuestions.length}`;
 }
 
-/* small preview mapping per question (fun) */
 function getPreviewForQuestion(index){
-  const previewPool = [
-    'pikachu','togepi','vulpix','squirtle','piplup','jigglypuff','psyduck','charizard','blastoise','venusaur',
-    'alakazam','onix','umbreon','gardevoir','articuno'
-  ];
-  // rotate a bit so preview changes
-  return `https://play.pokemonshowdown.com/sprites/ani/${previewPool[index % previewPool.length]}.gif`;
+  const pool = ['pikachu','togepi','vulpix','squirtle','piplup','jigglypuff','psyduck','charizard','blastoise','venusaur','alakazam','onix','umbreon','gardevoir','articuno'];
+  return `https://play.pokemonshowdown.com/sprites/ani/${pool[index % pool.length]}.gif`;
 }
 
-/* ============= HANDLE ANSWER ============= */
 function selectAnswer(option) {
-  // record
   answers.push(option);
-  // small flash or preview update
   previewImg.style.transform = 'scale(0.94)';
   setTimeout(()=> previewImg.style.transform = '', 140);
-
-  // next or finish
   current++;
   if (current < quizQuestions.length) {
     setTimeout(loadQuestion, 220);
@@ -537,85 +434,28 @@ function selectAnswer(option) {
   }
 }
 
-/* ============= POKéMON SCORING ============= */
+/* ============= POKéMON SCORING (original logic) ============= */
 function getPokemon(answers) {
-  const points = {
-    charizard:0, blastoise:0, venusaur:0, pikachu:0,
-    alakazam:0, articuno:0, onix:0, umbreon:0, gardevoir:0,
-    togepi:0, jigglypuff:0, vulpix:0, squirtle:0, piplup:0, psyduck:0
-  };
-
-  answers.forEach(ans => {
-    // Fire / Bold -> charizard / vulpix
-    if (["Neon","Coffee","Sunny","Fast","Rock","Summer","Pokéball","Red","Orange","Spicy","Mountains","Action","Dragon","Warrior","Sprint","Bonfire","Volcano","Guitar","Phoenix"].includes(ans)) {
-      points.charizard++;
-      if (["Orange","Red","Volcano","Bonfire","Guitar","Phoenix"].includes(ans)) points.vulpix++;
-    }
-
-    // Water / Calm -> blastoise / squirtle / piplup
-    if (["Pastel","Matcha","Rainy","Calm","Jazz","Monsoon","Potion","Blue","Aqua","Mild","Ocean","Swimming","Piano","Waterfall","Dolphin","Mermaid","Healer","Meditation","Lake"].includes(ans)) {
-      points.blastoise++;
-      if (["Ocean","Swimming","Summer","Blue","Dolphin"].includes(ans)) points.squirtle++;
-      if (["Aqua","Mild","Skyline","Piplup","Monsoon"].includes(ans)) points.piplup++;
-    }
-
-    // Grass / Earthy -> venusaur / togepi
-    if (["Earthy","Tea","Cloudy","Fruit","Steady","Ambient","Spring","Forest","Green","Brown","Sweet","Meadow","Hiking","Flute","Garden","Fairy","Guardian","Yoga","Greenhouse"].includes(ans)) {
-      points.venusaur++;
-      if (["Pastel","Sweet","Flute","Fairy","Meadow","Lake"].includes(ans)) points.togepi++;
-    }
-
-    // Electric / quirky -> pikachu / jigglypuff / psyduck
-    if (["Dark tones","Juice","Snowy","Chocolate","Unpredictable","Pop","Winter","City","Rare Candy","Master Ball","Yellow","Purple","Sour","Skyline","Gaming","Synthesizer","Lightning","Tiger","Robot","Inventor","Parkour","Laboratory","Arcade","Café"].includes(ans)) {
-      points.pikachu++;
-      if (["Pop","Piano","Synthesizer","Purple","Chocolate","City"].includes(ans)) points.jigglypuff++;
-      if (["Unpredictable","Cloudy","Snowy","Laboratory","Robot","Juice","Arcade"].includes(ans)) points.psyduck++;
-    }
-
-    // Psychic / thoughtful -> alakazam / gardevoir
-    if (["Meditation","Piano","Flute","Synthesizer","Inventor","Healer","Guardian","Fairy"].includes(ans)) {
-      points.alakazam++;
-      if (["Fairy","Guardian","Healer","Garden"].includes(ans)) points.gardevoir++;
-    }
-
-    // Ice / lone -> articuno
-    if (["Snowy","Winter","Lake"].includes(ans)) {
-      points.articuno++;
-    }
-
-    // Rock / sturdy -> onix
-    if (["Mountains","Rock","Volcano","Hiking","Sprint"].includes(ans)) {
-      points.onix++;
-    }
-
-    // Dark / mysterious -> umbreon
-    if (["Dark tones","Night","Robot","Tiger","Unpredictable"].includes(ans)) {
-      points.umbreon++;
-    }
-
-    // Additional scoring tweaks
-    if (["Orange","Red","Bonfire","Volcano","Guitar","Phoenix","Action"].includes(ans)) {
-      points.vulpix++;
-    }
-
-    if (["Gaming","Rare Candy","City","Arcade"].includes(ans)) {
-      points.squirtle++;
-      points.piplup++;
-    }
-
-    if (["Sweet","Fairy","Flute"].includes(ans)) points.togepi++;
-    if (["Pop","Piano","Purple"].includes(ans)) points.jigglypuff++;
-    if (["Cloudy","Unpredictable","Juice"].includes(ans)) points.psyduck++;
-  });
-
-  // Choose highest points
-  const priority = ["charizard","blastoise","venusaur","pikachu","togepi","jigglypuff","vulpix","squirtle","piplup","psyduck","alakazam","gardevoir","onix","umbreon","articuno"];
-  let best = priority[0];
-  priority.forEach(p => {
-    if (points[p] > points[best]) best = p;
-  });
-
-  return best;
+    const points = { charizard:0, blastoise:0, venusaur:0, pikachu:0, alakazam:0, articuno:0, onix:0, umbreon:0, gardevoir:0, togepi:0, jigglypuff:0, vulpix:0, squirtle:0, piplup:0, psyduck:0 };
+    answers.forEach(ans => {
+        if (["Neon","Coffee","Sunny","Fast","Rock","Summer","Pokéball","Red","Orange","Spicy","Mountains","Action","Dragon","Warrior","Sprint","Bonfire","Volcano","Guitar","Phoenix"].includes(ans)) { points.charizard++; if (["Orange","Red","Volcano","Bonfire","Guitar","Phoenix"].includes(ans)) points.vulpix++; }
+        if (["Pastel","Matcha","Rainy","Calm","Jazz","Monsoon","Potion","Blue","Aqua","Mild","Ocean","Swimming","Piano","Waterfall","Dolphin","Mermaid","Healer","Meditation","Lake"].includes(ans)) { points.blastoise++; if (["Ocean","Swimming","Summer","Blue","Dolphin"].includes(ans)) points.squirtle++; if (["Aqua","Mild","Skyline","Piplup","Monsoon"].includes(ans)) points.piplup++; }
+        if (["Earthy","Tea","Cloudy","Fruit","Steady","Ambient","Spring","Forest","Green","Brown","Sweet","Meadow","Hiking","Flute","Garden","Fairy","Guardian","Yoga","Greenhouse"].includes(ans)) { points.venusaur++; if (["Pastal","Sweet","Flute","Fairy","Meadow","Lake"].includes(ans)) points.togepi++; }
+        if (["Dark tones","Juice","Snowy","Chocolate","Unpredictable","Pop","Winter","City","Rare Candy","Master Ball","Yellow","Purple","Sour","Skyline","Gaming","Synthesizer","Lightning","Tiger","Robot","Inventor","Parkour","Laboratory","Arcade","Café"].includes(ans)) { points.pikachu++; if (["Pop","Piano","Synthesizer","Purple","Chocolate","City"].includes(ans)) points.jigglypuff++; if (["Unpredictable","Cloudy","Snowy","Laboratory","Robot","Juice","Arcade"].includes(ans)) points.psyduck++; }
+        if (["Meditation","Piano","Flute","Synthesizer","Inventor","Healer","Guardian","Fairy"].includes(ans)) { points.alakazam++; if (["Fairy","Guardian","Healer","Garden"].includes(ans)) points.gardevoir++; }
+        if (["Snowy","Winter","Lake"].includes(ans)) { points.articuno++; }
+        if (["Mountains","Rock","Volcano","Hiking","Sprint"].includes(ans)) { points.onix++; }
+        if (["Dark tones","Night","Robot","Tiger","Unpredictable"].includes(ans)) { points.umbreon++; }
+        if (["Orange","Red","Bonfire","Volcano","Guitar","Phoenix","Action"].includes(ans)) { points.vulpix++; }
+        if (["Gaming","Rare Candy","City","Arcade"].includes(ans)) { points.squirtle++; points.piplup++; }
+        if (["Sweet","Fairy","Flute"].includes(ans)) points.togepi++;
+        if (["Pop","Piano","Purple"].includes(ans)) points.jigglypuff++;
+        if (["Cloudy","Unpredictable","Juice"].includes(ans)) points.psyduck++;
+    });
+    const priority = ["charizard","blastoise","venusaur","pikachu","togepi","jigglypuff","vulpix","squirtle","piplup","psyduck","alakazam","gardevoir","onix","umbreon","articuno"];
+    let best = priority[0];
+    priority.forEach(p => { if (points[p] > points[best]) best = p; });
+    return best;
 }
 
 /* ============= RESULT / UI ============= */
@@ -623,7 +463,6 @@ function showResult() {
   const pokemonKey = getPokemon(answers);
   const prettyName = pokemonKey.charAt(0).toUpperCase() + pokemonKey.slice(1);
 
-  // Clear screen and build result
   dialogEl.innerHTML = '';
   optionsEl.innerHTML = '';
 
@@ -632,57 +471,143 @@ function showResult() {
 
   const card = document.createElement('div');
   card.className = 'result-card';
+  card.innerHTML = `
+    <div class="trainer-name">Trainer ${userName}</div>
+    <div class="pokemon-name">Your Pokémon is: ${prettyName}!</div>
+    <img src="https://play.pokemonshowdown.com/sprites/ani/${pokemonKey}.gif" alt="${prettyName}" style="max-width:200px; image-rendering:pixelated;">
+    <div class="muted">${getPersonalityBlurb(pokemonKey)}</div>
+  `;
+  
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.className = 'result-buttons';
 
-  const trainerEl = document.createElement('div');
-  trainerEl.className = 'trainer-name';
-  trainerEl.textContent = `Trainer ${userName}`;
-
-  const nameEl = document.createElement('div');
-  nameEl.className = 'pokemon-name';
-  nameEl.textContent = `Your Pokémon is: ${prettyName}!`;
-
-  const gif = document.createElement('img');
-  gif.style.maxWidth = '200px';
-  gif.style.imageRendering = 'pixelated';
-  gif.src = `https://play.pokemonshowdown.com/sprites/ani/${pokemonKey}.gif`;
-  gif.alt = prettyName;
-  gif.onerror = () => {
-    gif.src = `https://play.pokemonshowdown.com/sprites/ani/${pokemonKey.toLowerCase().replace(/\s+/g,'')}.gif`;
-  };
-
-  const desc = document.createElement('div');
-  desc.className = 'muted';
-  desc.textContent = getPersonalityBlurb(pokemonKey);
-
-  card.appendChild(trainerEl);
-  card.appendChild(nameEl);
-  card.appendChild(gif);
-  card.appendChild(desc);
-
-  const restart = document.createElement('button');
-  restart.className = 'restart';
-  restart.textContent = 'Take Quiz Again';
-  restart.onclick = () => { 
-    console.log('Restart button clicked'); // Debug log
+  const previewBtn = document.createElement('button');
+  previewBtn.className = 'restart'; // reuse style
+  previewBtn.textContent = 'Preview Holo Card';
+  previewBtn.onclick = () => {
     playSelectSound();
-    resetQuiz(); 
+    previewHoloCard(pokemonKey, userName);
   };
+
+  const downloadBtn = document.createElement('button');
+  downloadBtn.className = 'restart';
+  downloadBtn.textContent = 'Download Holo Card (PNG)';
+  downloadBtn.onclick = () => {
+    playSelectSound();
+    downloadHoloCard(pokemonKey, userName);
+  };
+
+  const restartBtn = document.createElement('button');
+  restartBtn.className = 'restart';
+  restartBtn.textContent = 'Take Quiz Again';
+  restartBtn.onclick = () => { playSelectSound(); resetQuiz(); };
+
+  buttonsContainer.appendChild(previewBtn);
+  buttonsContainer.appendChild(downloadBtn);
+  buttonsContainer.appendChild(restartBtn);
 
   rs.appendChild(card);
-  rs.appendChild(restart);
-
-  // Add to options area instead of replacing screen
+  rs.appendChild(buttonsContainer);
   optionsEl.appendChild(rs);
 
-  // Play victory sound
   setTimeout(() => playVictorySound(), 500);
-
-  // update preview panel
   previewImg.src = `https://play.pokemonshowdown.com/sprites/ani/${pokemonKey}.gif`;
   statusEl.textContent = `Result: ${prettyName}`;
 }
 
-/* Short blurb per Pokémon */
+/* ============= HOLO CARD FUNCTIONS ============= */
+
+function populateHoloCard(pokemonKey, trainerName) {
+    const details = pokemonDetails[pokemonKey];
+    if (!details) return;
+
+    document.getElementById('card-stage-info').innerHTML = `${details.stage} <span class="evolves-from">${details.evolvesFrom}</span>`;
+    document.getElementById('card-hp').textContent = details.hp;
+    document.getElementById('card-energy-symbol').style.backgroundColor = details.type;
+    document.getElementById('card-image-container').style.backgroundImage = `url('${details.img}')`;
+    document.getElementById('card-stats-bar').textContent = details.stats;
+    document.getElementById('card-ability-name').textContent = details.abilityName;
+    document.getElementById('card-ability-description').textContent = details.abilityDescription;
+    document.getElementById('card-attack-name').textContent = details.attackName;
+    document.getElementById('card-attack-damage').textContent = details.attackDamage;
+    document.getElementById('card-attack-description').textContent = details.attackDescription;
+    document.getElementById('card-weakness').textContent = details.weakness;
+    document.getElementById('card-retreat').textContent = details.retreat;
+}
+
+function previewHoloCard(pokemonKey, userName) {
+    quizContentEl.style.display = 'none';
+    holoCardContainerEl.style.display = 'flex';
+    
+    populateHoloCard(pokemonKey, userName);
+
+    // Attach mouse move listeners for interactive effect
+    pokemonCardEl.addEventListener('mousemove', handleCardMouseMove);
+    pokemonCardEl.addEventListener('mouseleave', handleCardMouseLeave);
+}
+
+document.getElementById('back-to-result').onclick = () => {
+    playSelectSound();
+    holoCardContainerEl.style.display = 'none';
+    quizContentEl.style.display = 'block';
+    
+    // Clean up listeners
+    pokemonCardEl.removeEventListener('mousemove', handleCardMouseMove);
+    pokemonCardEl.removeEventListener('mouseleave', handleCardMouseLeave);
+    pokemonCardEl.style.transform = ''; // Reset transform
+};
+
+function handleCardMouseMove(e) {
+    const rect = pokemonCardEl.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = (y - centerY) / 20;
+    const rotateY = (centerX - x) / 20;
+    pokemonCardEl.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    pokemonCardEl.style.setProperty('--mx', x / rect.width);
+    pokemonCardEl.style.setProperty('--my', y / rect.height);
+}
+
+function handleCardMouseLeave() {
+    pokemonCardEl.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+}
+
+async function downloadHoloCard(pokemonKey, userName) {
+    // Populate the card with the correct data
+    populateHoloCard(pokemonKey, userName);
+    const cardInner = pokemonCardEl.querySelector('.card-inner');
+
+    // --- PREPARE FOR CAPTURE ---
+    pokemonCardEl.style.transform = 'none'; // Flatten the card
+    cardInner.classList.add('is-capturing'); // Add class to apply static glitter
+
+    // Allow a brief moment for the browser to apply the new class
+    setTimeout(() => {
+        html2canvas(pokemonCardEl, {
+            scale: 2, 
+            useCORS: true,
+            backgroundColor: null
+        }).then(canvas => {
+            const link = document.createElement('a');
+            const safeName = (userName || 'trainer').replace(/[^a-z0-9_-]/gi, '_');
+            link.download = `${safeName}_${pokemonKey}_card.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            link.remove();
+        }).catch(err => {
+            console.error("Oops, could not create card image!", err);
+            alert('Sorry — could not generate the PNG. If this persists try a different browser.');
+        }).finally(() => {
+            // --- CLEAN UP AFTER CAPTURE ---
+            cardInner.classList.remove('is-capturing');
+            pokemonCardEl.style.transform = ''; // Let CSS handle hover state again
+        });
+    }, 100); // 100ms delay to ensure styles are applied
+}
+
+/* ============= SHORT BLURB PER POKéMON ============= */
 function getPersonalityBlurb(key) {
   const blurbs = {
     charizard: "Fiery and adventurous — you take charge and love action.",
@@ -706,88 +631,60 @@ function getPersonalityBlurb(key) {
 
 /* ============= RESET ============= */
 function resetQuiz(){
-  console.log('resetQuiz() called'); // Debug log
   current = -1;
   answers = [];
   userName = "";
   
-  // Clear any existing content
+  quizContentEl.style.display = 'block';
+  holoCardContainerEl.style.display = 'none';
   dialogEl.innerHTML = '';
   optionsEl.innerHTML = '';
   
-  // Reset preview
   previewImg.src = 'https://play.pokemonshowdown.com/sprites/ani/pikachu.gif';
   statusEl.textContent = 'Welcome, trainer!';
   
-  // Start name input
-  setTimeout(() => {
-    showNameInput();
-  }, 100);
+  setTimeout(() => { showNameInput(); }, 100);
 }
 
 /* ============= RETRO SOUND EFFECTS ============= */
-// Create AudioContext for retro sounds
 let audioContext = null;
+function initAudio() { if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)(); }
 
-function initAudio() {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  }
-}
-
-// GameBoy-style selection sound
 function playSelectSound() {
   initAudio();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  
-  oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
-  
-  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-  
-  oscillator.type = 'square';
-  oscillator.start();
-  oscillator.stop(audioContext.currentTime + 0.15);
+  const osc = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  osc.connect(gain);
+  gain.connect(audioContext.destination);
+  osc.frequency.setValueAtTime(800, audioContext.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+  gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+  osc.type = 'square';
+  osc.start();
+  osc.stop(audioContext.currentTime + 0.15);
 }
 
-// GameBoy victory fanfare
 function playVictorySound() {
   initAudio();
-  
-  // Victory melody notes (simplified Pokemon center healing sound)
   const melody = [
-    { freq: 523.25, time: 0 },     // C5
-    { freq: 659.25, time: 0.15 },  // E5  
-    { freq: 783.99, time: 0.3 },   // G5
-    { freq: 1046.5, time: 0.45 },  // C6
-    { freq: 783.99, time: 0.6 },   // G5
-    { freq: 1046.5, time: 0.75 },  // C6
-    { freq: 1318.5, time: 0.9 },   // E6
-    { freq: 1046.5, time: 1.05 }   // C6
+    { freq: 523.25, time: 0 }, { freq: 659.25, time: 0.15 }, { freq: 783.99, time: 0.3 },
+    { freq: 1046.5, time: 0.45 }, { freq: 783.99, time: 0.6 }, { freq: 1046.5, time: 0.75 },
+    { freq: 1318.5, time: 0.9 }, { freq: 1046.5, time: 1.05 }
   ];
-  
   melody.forEach(note => {
     setTimeout(() => {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.setValueAtTime(note.freq, audioContext.currentTime);
-      oscillator.type = 'square';
-      
-      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12);
-      
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.12);
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+      osc.frequency.setValueAtTime(note.freq, audioContext.currentTime);
+      osc.type = 'square';
+      gain.gain.setValueAtTime(0, audioContext.currentTime);
+      gain.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12);
+      osc.start();
+      osc.stop(audioContext.currentTime + 0.12);
     }, note.time * 1000);
   });
 }
