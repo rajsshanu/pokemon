@@ -1280,7 +1280,7 @@
     setInterval(() => {
       timePhase = (timePhase + 1) % 4;
       const indicator = document.querySelector('.time-indicator');
-      // const phases = ['🌅 Dawn', '☀️ Day', '🌇 Dusk', '🌙 Night'];
+      const phases = ['🌅 Dawn', '☀️ Day', '🌇 Dusk', '🌙 Night'];
       indicator.textContent = phases[timePhase];
     }, 5000);
 
@@ -1472,42 +1472,67 @@
       }
     }
 
-    /* ============= NEW POKéMON SCORING LOGIC ============= */
+    /* ============= POKéMON SCORING LOGIC (COLOR PRIORITY) ============= */
     function getPokemon(answers) {
-      const points = { charizard: 0, blastoise: 0, venusaur: 0, pikachu: 0, alakazam: 0, articuno: 0, onix: 0, umbreon: 0, gardevoir: 0, togepi: 0, jigglypuff: 0, vulpix: 0, squirtle: 0, piplup: 0, psyduck: 0 };
+        const points = { charizard: 0, blastoise: 0, venusaur: 0, pikachu: 0, alakazam: 0, articuno: 0, onix: 0, umbreon: 0, gardevoir: 0, togepi: 0, jigglypuff: 0, vulpix: 0, squirtle: 0, piplup: 0, psyduck: 0 };
 
-      // Award points based on the new mapping
-      answers.forEach(answer => {
-        const associatedPokemon = answerToPokemonMap[answer];
-        if (associatedPokemon) {
-          associatedPokemon.forEach(pokemon => {
-            if (points.hasOwnProperty(pokemon)) {
-              points[pokemon]++;
+        // 1. Calculate a score for all pokémon based on all answers.
+        answers.forEach(answer => {
+            const associatedPokemon = answerToPokemonMap[answer];
+            if (associatedPokemon) {
+                associatedPokemon.forEach(pokemon => {
+                    if (points.hasOwnProperty(pokemon)) {
+                        points[pokemon]++;
+                    }
+                });
             }
-          });
-        }
-      });
+        });
 
-      // Find the maximum score
-      let maxScore = -1;
-      for (const pokemon in points) {
-        if (points[pokemon] > maxScore) {
-          maxScore = points[pokemon];
+        // 2. Identify the Pokémon related to the user's color choice.
+        const colorAnswer = answers[0]; // From "What's your favorite color palette?"
+        const colorPriorityGroup = answerToPokemonMap[colorAnswer] || [];
+        
+        // 3. If the color choice doesn't map to any Pokémon, fall back to the highest overall score.
+        if (colorPriorityGroup.length === 0) {
+            let maxScore = -1;
+            let winners = [];
+            for (const pokemon in points) {
+                if (points[pokemon] > maxScore) {
+                    maxScore = points[pokemon];
+                    winners = [pokemon];
+                } else if (points[pokemon] === maxScore) {
+                    winners.push(pokemon);
+                }
+            }
+            return winners[Math.floor(Math.random() * winners.length)] || 'pikachu';
         }
-      }
+        
+        // 4. Find the highest-scoring Pokémon THAT IS ALSO in the color priority group.
+        let bestMatch = '';
+        let highestScoreInGroup = -1;
+        let tieBreakerList = [];
 
-      // Find all Pokémon that are tied for the highest score
-      const winners = [];
-      for (const pokemon in points) {
-        if (points[pokemon] === maxScore) {
-          winners.push(pokemon);
+        // Iterate through the priority list to find the best candidate based on the full scoring.
+        colorPriorityGroup.forEach(pokemon => {
+            const score = points[pokemon];
+            if (score > highestScoreInGroup) {
+                highestScoreInGroup = score;
+                tieBreakerList = [pokemon]; // Start a new list of winners
+            } else if (score === highestScoreInGroup) {
+                tieBreakerList.push(pokemon); // Add to the list of tied winners
+            }
+        });
+        
+        // 5. If there's a tie among the preferred Pokémon, pick one randomly.
+        if (tieBreakerList.length > 0) {
+            const randomIndex = Math.floor(Math.random() * tieBreakerList.length);
+            return tieBreakerList[randomIndex];
         }
-      }
 
-      // If there's a tie, pick a random winner from the tied list. Otherwise, return the only winner.
-      const randomIndex = Math.floor(Math.random() * winners.length);
-      return winners[randomIndex];
+        // Fallback: if no scored Pokémon were in the priority list (unlikely), just pick one from that list.
+        return colorPriorityGroup[Math.floor(Math.random() * colorPriorityGroup.length)];
     }
+
 
     /* ============= RESULT / UI ============= */
     function showResult() {
@@ -1757,4 +1782,4 @@
   </script>
 </body>
 
-</html>
+</html>```
